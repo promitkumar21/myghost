@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Ghost — A Journal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Caveat:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;1,400&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- SVG noise filter for grain -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0">
+    <defs>
+      <filter id="grain-f" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.75 0.75" numOctaves="4" seed="2" stitchTiles="stitch" />
+        <feColorMatrix type="saturate" values="0" />
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Grain overlay -->
+  <div id="grain"></div>
+
+  <!-- Scroll progress bar -->
+  <div id="progress"></div>
+
+  <!-- Ghost cursors -->
+  <div id="gc-main">
+    <svg viewBox="0 0 102 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 15 95 C 15 40, 25 10, 51 10 C 77 10, 87 40, 87 95 Q 83 105, 79 95 Q 75 85, 71 95 Q 67 105, 63 95 Q 59 85, 55 95 Q 51 105, 47 95 Q 43 85, 39 95 Q 35 105, 31 95 Q 27 85, 23 95 Q 19 105, 15 95 Z" fill="#fff4e4" stroke="#7e636b" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="37" cy="48" r="5.5" fill="#71514e"/>
+      <circle cx="65" cy="48" r="5.5" fill="#71514e"/>
+      <circle cx="26" cy="55" r="7" fill="#ffc4c2"/>
+      <circle cx="76" cy="55" r="7" fill="#ffc4c2"/>
+      <path d="M 45 53 Q 51 60 57 53" stroke="#71514e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div id="gc-trail">
+    <svg viewBox="0 0 102 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 15 95 C 15 40, 25 10, 51 10 C 77 10, 87 40, 87 95 Q 83 105, 79 95 Q 75 85, 71 95 Q 67 105, 63 95 Q 59 85, 55 95 Q 51 105, 47 95 Q 43 85, 39 95 Q 35 105, 31 95 Q 27 85, 23 95 Q 19 105, 15 95 Z" fill="#fff4e4" stroke="#7e636b" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="37" cy="48" r="5.5" fill="#71514e"/>
+      <circle cx="65" cy="48" r="5.5" fill="#71514e"/>
+      <circle cx="26" cy="55" r="7" fill="#ffc4c2"/>
+      <circle cx="76" cy="55" r="7" fill="#ffc4c2"/>
+      <path d="M 45 53 Q 51 60 57 53" stroke="#71514e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- Mouse spotlight -->
+  <div id="spotlight"></div>
+
+  <!-- Intro -->
+  <div id="intro">
+    <div class="boo">Boo.</div>
+  </div>
+
+  <!-- Stars -->
+  <canvas id="stars"></canvas>
+
+  <!-- ═══════════════ HERO ═══════════════ -->
+  <section id="hero">
+
+    <div class="moon-wrap" id="moonWrap">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="moon-blur" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.5" />
+          </filter>
+          <mask id="moon-mask">
+            <rect x="0" y="0" width="120" height="120" fill="white" />
+            <circle cx="75" cy="45" r="50" fill="black" filter="url(#moon-blur)" />
+          </mask>
+        </defs>
+        <circle cx="60" cy="60" r="54" fill="#fcfcf8" mask="url(#moon-mask)" />
+        <circle cx="18" cy="22" r="1.3" fill="rgba(255,255,210,.7)" />
+        <circle cx="26" cy="10" r=".8" fill="rgba(255,255,210,.5)" />
+        <circle cx="10" cy="36" r=".7" fill="rgba(255,255,210,.6)" />
+        <circle cx="34" cy="6" r=".5" fill="rgba(255,255,210,.4)" />
+      </svg>
+    </div>
+
+    <!-- Ghost 1 — large, expressive, eyes track cursor -->
+    <div class="ghost g1" id="ghost1">
+      <svg id="ghost1svg" viewBox="0 0 102 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 15 95 C 15 40, 25 10, 51 10 C 77 10, 87 40, 87 95 Q 83 105, 79 95 Q 75 85, 71 95 Q 67 105, 63 95 Q 59 85, 55 95 Q 51 105, 47 95 Q 43 85, 39 95 Q 35 105, 31 95 Q 27 85, 23 95 Q 19 105, 15 95 Z" fill="#fff4e4" stroke="#7e636b" stroke-width="4" stroke-linejoin="round"/>
+        <circle id="eye1l" cx="37" cy="48" r="5.5" fill="#71514e"/>
+        <circle id="eye1r" cx="65" cy="48" r="5.5" fill="#71514e"/>
+        <circle cx="26" cy="55" r="7" fill="#ffc4c2"/>
+        <circle cx="76" cy="55" r="7" fill="#ffc4c2"/>
+        <path d="M 45 53 Q 51 60 57 53" stroke="#71514e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Ghost 2 -->
+    <div class="ghost g2">
+      <svg viewBox="0 0 102 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 15 95 C 15 40, 25 10, 51 10 C 77 10, 87 40, 87 95 Q 83 105, 79 95 Q 75 85, 71 95 Q 67 105, 63 95 Q 59 85, 55 95 Q 51 105, 47 95 Q 43 85, 39 95 Q 35 105, 31 95 Q 27 85, 23 95 Q 19 105, 15 95 Z" fill="#fff4e4" stroke="#7e636b" stroke-width="4" stroke-linejoin="round"/>
+        <circle cx="37" cy="48" r="5.5" fill="#71514e"/>
+        <circle cx="65" cy="48" r="5.5" fill="#71514e"/>
+        <circle cx="26" cy="55" r="7" fill="#ffc4c2"/>
+        <circle cx="76" cy="55" r="7" fill="#ffc4c2"/>
+        <path d="M 45 53 Q 51 60 57 53" stroke="#71514e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Ghost 3 — small, shy -->
+    <div class="ghost g3">
+      <svg viewBox="0 0 102 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 15 95 C 15 40, 25 10, 51 10 C 77 10, 87 40, 87 95 Q 83 105, 79 95 Q 75 85, 71 95 Q 67 105, 63 95 Q 59 85, 55 95 Q 51 105, 47 95 Q 43 85, 39 95 Q 35 105, 31 95 Q 27 85, 23 95 Q 19 105, 15 95 Z" fill="#fff4e4" stroke="#7e636b" stroke-width="4" stroke-linejoin="round"/>
+        <circle cx="37" cy="48" r="5.5" fill="#71514e"/>
+        <circle cx="65" cy="48" r="5.5" fill="#71514e"/>
+        <circle cx="26" cy="55" r="7" fill="#ffc4c2"/>
+        <circle cx="76" cy="55" r="7" fill="#ffc4c2"/>
+        <path d="M 45 53 Q 51 60 57 53" stroke="#71514e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Title -->
+    <div class="hero-inner">
+      <p class="hero-eyebrow">a journal of someone I love</p>
+      <h1 class="hero-title">
+        <span>My</span>
+        <span>Ghost</span>
+      </h1>
+      <p class="hero-sub">always trying to haunt heart &ensp;·&ensp; always here, in silence</p>
+    </div>
+
+    <!-- City silhouette -->
+    <svg class="city" viewBox="0 0 1440 210" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1440" height="210" fill="#07070a" />
+      <rect x="0" y="105" width="56" height="105" fill="#0c0b0f" />
+      <rect x="4" y="113" width="9" height="8" fill="rgba(255,255,160,.12)" />
+      <rect x="20" y="124" width="9" height="8" fill="rgba(255,255,160,.08)" />
+      <rect x="36" y="118" width="9" height="8" fill="rgba(255,255,160,.2)" />
+      <rect x="50" y="62" width="76" height="148" fill="#0b0a0e" />
+      <rect x="55" y="72" width="11" height="9" fill="rgba(255,255,160,.15)" />
+      <rect x="77" y="82" width="11" height="9" fill="rgba(255,255,160,.06)" />
+      <rect x="99" y="68" width="11" height="9" fill="rgba(255,255,160,.22)" />
+      <rect x="55" y="94" width="11" height="9" fill="rgba(255,255,160,.3)" />
+      <rect x="77" y="94" width="11" height="9" fill="rgba(255,255,160,.1)" />
+      <rect x="122" y="32" width="50" height="178" fill="#0d0c10" />
+      <line x1="147" y1="32" x2="147" y2="5" stroke="rgba(255,255,255,.18)" stroke-width="1" />
+      <rect x="127" y="44" width="9" height="8" fill="rgba(255,255,160,.12)" />
+      <rect x="148" y="58" width="9" height="8" fill="rgba(255,255,160,.2)" />
+      <rect x="167" y="78" width="87" height="132" fill="#0e0d12" />
+      <rect x="172" y="90" width="13" height="11" fill="rgba(255,255,160,.08)" />
+      <rect x="197" y="90" width="13" height="11" fill="rgba(255,255,160,.26)" />
+      <rect x="222" y="90" width="13" height="11" fill="rgba(255,255,160,.14)" />
+      <rect x="172" y="114" width="13" height="11" fill="rgba(255,255,160,.34)" />
+      <rect x="210" y="114" width="13" height="11" fill="rgba(255,255,160,.08)" />
+      <rect x="248" y="98" width="56" height="112" fill="#0c0b0f" />
+      <rect x="254" y="110" width="10" height="9" fill="rgba(255,255,160,.22)" />
+      <rect x="281" y="110" width="10" height="9" fill="rgba(255,255,160,.1)" />
+      <rect x="298" y="48" width="66" height="162" fill="#0b0a0e" />
+      <line x1="330" y1="48" x2="330" y2="16" stroke="rgba(255,255,255,.12)" stroke-width="1" />
+      <rect x="1092" y="72" width="66" height="138" fill="#0c0b0f" />
+      <rect x="1097" y="84" width="11" height="9" fill="rgba(255,255,160,.18)" />
+      <rect x="1122" y="96" width="11" height="9" fill="rgba(255,255,160,.1)" />
+      <rect x="1153" y="48" width="86" height="162" fill="#0b0a0e" />
+      <line x1="1196" y1="48" x2="1196" y2="18" stroke="rgba(255,255,255,.14)" stroke-width="1" />
+      <rect x="1160" y="62" width="11" height="9" fill="rgba(255,255,160,.24)" />
+      <rect x="1198" y="72" width="11" height="9" fill="rgba(255,255,160,.12)" />
+      <rect x="1234" y="30" width="56" height="180" fill="#0d0c10" />
+      <line x1="1262" y1="30" x2="1262" y2="4" stroke="rgba(255,255,255,.16)" stroke-width="1" />
+      <rect x="1240" y="44" width="11" height="9" fill="rgba(255,255,160,.16)" />
+      <rect x="1263" y="58" width="11" height="9" fill="rgba(255,255,160,.3)" />
+      <rect x="1284" y="68" width="76" height="142" fill="#0e0d12" />
+      <rect x="1290" y="80" width="11" height="9" fill="rgba(255,255,160,.1)" />
+      <rect x="1325" y="80" width="11" height="9" fill="rgba(255,255,160,.36)" />
+      <rect x="1355" y="90" width="60" height="120" fill="#0c0b0f" />
+      <rect x="1360" y="102" width="11" height="9" fill="rgba(255,255,160,.2)" />
+      <rect x="1406" y="103" width="34" height="107" fill="#0b0a0e" />
+    </svg>
+
+    <div class="scroll-hint">
+      <span>scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- Torn top -->
+  <div class="torn">
+    <svg viewBox="0 0 1440 55" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M0,0 L0,42 Q44,22 88,40 Q132,56 176,34 Q220,10 264,42 Q308,68 352,40 Q396,10 440,44 Q484,70 528,42 Q572,12 616,46 Q660,72 704,42 Q748,8 792,44 Q836,72 880,42 Q924,8 968,46 Q1012,72 1056,42 Q1100,8 1144,44 Q1188,72 1232,42 Q1276,8 1320,44 Q1364,70 1408,42 L1440,38 L1440,0 Z"
+        fill="#0d0c10" />
+    </svg>
+  </div>
+
+  <!-- ═══════════════ JOURNAL ═══════════════ -->
+  <section id="journal">
+    <div class="j-img-wrap">
+      <div class="j-img-inner">
+        <img class="j-img" src="journal.png" alt="My journal spread"
+          onerror="this.style.display='none';document.getElementById('jph').style.display='flex'">
+        <div id="jph" class="j-placeholder" style="display:none">
+          <p>Place your journal photo here.<br><br>
+            Name it <code>journal.png</code><br>
+            and put it in this same folder.</p>
+        </div>
+        <div class="hotspot hs-ghost"></div>
+        <div class="hotspot hs-sunflower"></div>
+        <div class="hotspot hs-owl"></div>
+      </div>
+      <div class="j-img-glow"></div>
+    </div>
+    <div class="j-text reveal-right" id="jText">
+      <span class="tag">✦ the journal</span>
+      <h2 class="sec-title">Two pages.<br>A whole world.</h2>
+      <p class="body-p">Every symbol on these pages means something only I understand. The ghosts are her. The moon,
+        because we talked all night. The butterfly, because she gave me that feeling you cannot name. The sunflower —
+        that is what I called her. The owl, for every late night we were both awake. The buildings on the left, because
+        that is where she lived.</p>
+      <p class="body-q">"Once upon a time, we used to talk a lot, laugh a lot, share our joys. Even now, but in
+        silence."</p>
+      <div class="j-deco"></div>
+    </div>
+  </section>
+
+  <!-- Torn bottom of journal -->
+  <div class="torn" style="background:var(--surf)">
+    <svg viewBox="0 0 1440 55" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M0,55 L0,18 Q38,38 76,20 Q114,2 152,26 Q190,50 228,22 Q266,0 304,26 Q342,50 380,22 Q418,0 456,28 Q494,52 532,24 Q570,0 608,28 Q646,52 684,24 Q722,0 760,26 Q798,52 836,24 Q874,0 912,28 Q950,52 988,24 Q1026,0 1064,28 Q1102,52 1140,24 Q1178,0 1216,28 Q1254,52 1292,24 Q1330,0 1368,26 Q1406,50 1440,24 L1440,55 Z"
+        fill="#07070a" />
+    </svg>
+  </div>
+
+  <!-- ═══════════════ POEM ═══════════════ -->
+  <section id="poem">
+    <div class="poem-wrap">
+      <span class="poem-tag">— written in the pages —</span>
+      <div class="poem-lines">
+        <span class="pl">Ghost!</span>
+        <span class="pl">Always trying to haunt heart...</span>
+        <span class="pl">walk beside like an invisible shadow.</span>
+        <span class="pl">remind us that true love never truly dies.</span>
+        <span class="pl">remind us that we are never truly alone.</span>
+        <span class="pl spacer">&nbsp;</span>
+        <span class="pl">A spirit is just a story</span>
+        <span class="pl">that refuses to be forgotten.</span>
+        <span class="pl">some spirits stay not to scare</span>
+        <span class="pl">but to watch over us.</span>
+        <span class="pl spacer">&nbsp;</span>
+        <span class="pl">some ghost are just love stories</span>
+        <span class="pl">that never found an ending.</span>
+        <span class="pl">remind us that love is eternal.</span>
+        <span class="pl pl-gold">remind us of its presence............</span>
+      </div>
+    </div>
+    <div class="poem-deco-left">
+      <svg viewBox="0 0 102 112" style="width: 100%; height: 100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 15 95 C 15 40, 25 10, 51 10 C 77 10, 87 40, 87 95 Q 83 105, 79 95 Q 75 85, 71 95 Q 67 105, 63 95 Q 59 85, 55 95 Q 51 105, 47 95 Q 43 85, 39 95 Q 35 105, 31 95 Q 27 85, 23 95 Q 19 105, 15 95 Z" fill="#fff4e4" stroke="#7e636b" stroke-width="4" stroke-linejoin="round"/>
+        <circle cx="37" cy="48" r="5.5" fill="#71514e"/>
+        <circle cx="65" cy="48" r="5.5" fill="#71514e"/>
+        <circle cx="26" cy="55" r="7" fill="#ffc4c2"/>
+        <circle cx="76" cy="55" r="7" fill="#ffc4c2"/>
+        <path d="M 45 53 Q 51 60 57 53" stroke="#71514e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="poem-deco-right">🌙</div>
+  </section>
+
+  <!-- ═══════════════ LETTER ═══════════════ -->
+  <section id="letter">
+    <div class="letter-paper reveal-up" id="letterPaper">
+      <div class="tape"></div>
+      <p class="letter-date">somewhere between midnight and 3am</p>
+      <div class="letter-body">
+        <p>Dear Ghost,</p>
+        <br>
+        <p>I haven't forgotten. I won't.</p>
+        <br>
+        <p>The journal is full now. Every page has you in it somewhere — in the margins, in the midnight ink, in the
+          <span class="ann">butterfly</span> I drew because you always gave me that feeling.
+        </p>
+        <br>
+        <p>I still look at the <span class="ann">moon</span> and think of you. I still draw those little ghosts in my
+          notebooks. I still call you <span class="ann">sunflower</span>, even if only inside my head.</p>
+        <br>
+        <p>We don't talk anymore. But somehow, I think you know.</p>
+      </div>
+      <p class="letter-sign">— P</p>
+      <div class="letter-fold"></div>
+    </div>
+  </section>
+
+
+
+  <!-- ═══════════════ ALIVE SCENE (CLOSING) ═══════════════ -->
+  <section id="closing" class="alive-closing">
+    <!-- Animated ghost image scene -->
+    <div class="alive-viewport" id="aliveViewport">
+      <div class="alive-fade-top"></div>
+      <img class="alive-image" src="myghostimage.jpeg" alt="A glowing ghost and a black cat under a starry night">
+
+      <!-- Starry sky + shooting stars -->
+      <canvas id="aliveStarfield"></canvas>
+
+      <!-- Slow-moving clouds -->
+      <div class="alive-cloud ac1"></div>
+      <div class="alive-cloud ac2"></div>
+      <div class="alive-cloud ac3"></div>
+
+
+
+      <!-- Floating star particles -->
+      <div class="alive-stars-float" id="aliveStarsFloat"></div>
+
+
+
+      <!-- Title card -->
+      <div class="alive-title-card" id="aliveTitleCard">
+        <span class="alive-subtitle">✦ a living night</span>
+        <h2 class="alive-title">Even now,<br>but in silence.</h2>
+        <p class="alive-caption">Move your mouse — the scene breathes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ FOOTER ═══════════════ -->
+  <footer id="footer">
+    <div>
+      <p class="f-ghost" style="margin-bottom:14px">find her here</p>
+      <a href="https://www.instagram.com/amarbhooot?igsh=Y2NpenZuZ24wdXBr" target="_blank" rel="noopener"
+        class="ig-link">
+        <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+          <circle cx="12" cy="12" r="4" />
+          <circle cx="17.5" cy="6.5" r="1.3" fill="currentColor" stroke="none" />
+        </svg>
+        @amarbhooot
+      </a>
+    </div>
+    <div class="f-brand">My Ghost</div>
+    <p class="f-ghost" style="text-align:right">made with memory<br>&amp; a little haunting</p>
+  </footer>
+
+  <!-- ═══════════════ MUSIC PLAYER ═══════════════ -->
+  <audio id="bg-music" loop>
+    <source src="I%20wanna%20be%20yours%20(%20Artic%20Monkeys)%20no%20copyright.%20%23song%20%23feel.mp3"
+      type="audio/mpeg">
+  </audio>
+  <div id="music-toggle" class="music-toggle" title="Toggle Music">
+    <div class="bars">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
+    <span class="mt-text">Music</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
